@@ -81,7 +81,15 @@ class YPAssetViewContainer: UIView {
         multipleSelectionButton-15-|
         multipleSelectionButton.setImage(YPConfig.icons.multipleSelectionOffIcon, for: .normal)
         multipleSelectionButton.Bottom == zoomableView!.Bottom - 15
+
+        let image = YPConfig.icons.multipleSelectionOnIcon
+        multipleSelectionButton.setImage(image, for: .normal)
+        multipleSelectionButton.tintColor = .white
+        multipleSelectionButton.layer.cornerRadius = 21
+        multipleSelectionButton.imageView?.contentMode = .scaleAspectFit
+        multipleSelectionButton.backgroundColor = .darkGray
         
+        squareCropButton.isHidden = true
     }
     
     // MARK: - Square button
@@ -96,15 +104,14 @@ class YPAssetViewContainer: UIView {
     
     
     public func refreshSquareCropButton() {
-        if onlySquare {
-            squareCropButton.isHidden = true
-        } else {
-            if let image = zoomableView?.assetImageView.image {
-                let isImageASquare = image.size.width == image.size.height
-                squareCropButton.isHidden = isImageASquare
-            }
-        }
-        
+//        if onlySquare {
+//            squareCropButton.isHidden = true
+//        } else {
+//            if let image = zoomableView?.assetImageView.image {
+//                let isImageASquare = image.size.width == image.size.height
+//                squareCropButton.isHidden = isImageASquare
+//            }
+//        }
         let shouldFit = YPConfig.library.onlySquare ? true : shouldCropToSquare
         zoomableView?.fitImage(shouldFit)
     }
@@ -114,9 +121,10 @@ class YPAssetViewContainer: UIView {
     /// Use this to update the multiple selection mode UI state for the YPAssetViewContainer
     public func setMultipleSelectionMode(on: Bool) {
         isMultipleSelection = on
-        let image = on ? YPConfig.icons.multipleSelectionOnIcon : YPConfig.icons.multipleSelectionOffIcon
-        multipleSelectionButton.setImage(image, for: .normal)
-        refreshSquareCropButton()
+        let backgroundColor: UIColor = on ? YPConfig.colors.tintColor : .darkGray
+        multipleSelectionButton.backgroundColor = backgroundColor
+//        refreshSquareCropButton()
+    
     }
 }
 
