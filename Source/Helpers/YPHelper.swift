@@ -28,6 +28,7 @@ struct YPHelper {
             let backButtonIcon = YPConfig.icons.backButtonIcon
             controller.navigationController?.navigationBar.backIndicatorImage = backButtonIcon
             controller.navigationController?.navigationBar.backIndicatorTransitionMaskImage = backButtonIcon
+            controller.navigationController?.navigationBar.tintColor = YPConfig.colors.tintColor
         }
     }
     
