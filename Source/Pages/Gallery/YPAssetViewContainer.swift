@@ -29,8 +29,8 @@ class YPAssetViewContainer: UIView {
     override func awakeFromNib() {
         super.awakeFromNib()
         
-        addSubview(grid)
-        grid.frame = frame
+//        addSubview(grid)
+//        grid.frame = frame
         clipsToBounds = true
         
         for sv in subviews {
@@ -40,7 +40,7 @@ class YPAssetViewContainer: UIView {
             }
         }
         
-        grid.alpha = 0
+//        grid.alpha = 0
         
         let touchDownGR = UILongPressGestureRecognizer(target: self,
                                                        action: #selector(handleTouchDown))
@@ -134,8 +134,8 @@ extension YPAssetViewContainer: YPAssetZoomableViewDelegate {
         let newFrame = zoomableView.assetImageView.convert(zoomableView.assetImageView.bounds, to: self)
         
         // update grid position
-        grid.frame = frame.intersection(newFrame)
-        grid.layoutIfNeeded()
+//        grid.frame = frame.intersection(newFrame)
+//        grid.layoutIfNeeded()
         
         // Update play imageView position - bringing the playImageView from the videoView to assetViewContainer,
         // but the controll for appearing it still in videoView.
@@ -146,17 +146,17 @@ extension YPAssetViewContainer: YPAssetZoomableViewDelegate {
     }
     
     public func ypAssetZoomableViewScrollViewDidZoom() {
-        if isShown {
-            UIView.animate(withDuration: 0.1) {
-                self.grid.alpha = 1
-            }
-        }
+//        if isShown {
+//            UIView.animate(withDuration: 0.1) {
+//                self.grid.alpha = 1
+//            }
+//        }
     }
     
     public func ypAssetZoomableViewScrollViewDidEndZooming() {
-        UIView.animate(withDuration: 0.3) {
-            self.grid.alpha = 0
-        }
+//        UIView.animate(withDuration: 0.3) {
+//            self.grid.alpha = 0
+//        }
     }
 }
 
@@ -173,18 +173,18 @@ extension YPAssetViewContainer: UIGestureRecognizerDelegate {
     
     @objc
     private func handleTouchDown(sender: UILongPressGestureRecognizer) {
-        switch sender.state {
-        case .began:
-            if isShown {
-                UIView.animate(withDuration: 0.1) {
-                    self.grid.alpha = 1
-                }
-            }
-        case .ended:
-            UIView.animate(withDuration: 0.3) {
-                self.grid.alpha = 0
-            }
-        default: ()
-        }
+//        switch sender.state {
+//        case .began:
+//            if isShown {
+//                UIView.animate(withDuration: 0.1) {
+//                    self.grid.alpha = 1
+//                }
+//            }
+//        case .ended:
+//            UIView.animate(withDuration: 0.3) {
+//                self.grid.alpha = 0
+//            }
+//        default: ()
+//        }
     }
 }
