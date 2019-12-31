@@ -63,13 +63,18 @@ public class YPSelectionsGalleryVC: UIViewController {
     
     @objc
     private func removeButtonDidClick(sender: UIButton) {
-        guard let cell = sender.superview as? UICollectionViewCell, let indexPath = v.collectionView.indexPath(for: cell) else {
+        guard let cell = sender.superview?.superview as? UICollectionViewCell, let indexPath = v.collectionView.indexPath(for: cell) else {
             return
         }
         items.remove(at: indexPath.row)
         v.collectionView.performBatchUpdates({
             v.collectionView.deleteItems(at: [indexPath])
-        }, completion: { _ in })
+        }, completion: { [weak self] _ in
+            guard let `self` = self else { return }
+            if self.items.isEmpty {
+                self.navigationController?.popViewController(animated: true)
+            }
+        })
     }
 }
 
