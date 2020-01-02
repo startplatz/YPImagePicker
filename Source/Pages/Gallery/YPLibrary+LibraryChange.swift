@@ -31,7 +31,11 @@ extension YPLibraryVC: PHPhotoLibraryChangeObserver {
                         }
                         let insertedIndexes = collectionChanges!.insertedIndexes
                         if (insertedIndexes?.count ?? 0) != 0 {
-                            collectionView.insertItems(at: insertedIndexes!.aapl_indexPathsFromIndexesWithSection(0))
+                            let indexPaths = insertedIndexes!.aapl_indexPathsFromIndexesWithSection(0)
+                            collectionView.insertItems(at: indexPaths)
+                            if let indexPath = indexPaths.first {
+                                self.select(at: indexPath)
+                            }
                         }
                     }, completion: { finished in
                         if finished {

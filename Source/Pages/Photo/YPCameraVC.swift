@@ -11,8 +11,8 @@ import AVFoundation
 import Photos
 
 public class YPCameraVC: UIViewController, UIGestureRecognizerDelegate, YPPermissionCheckable {
-    
-    public var didCapturePhoto: ((UIImage) -> Void)?
+    public typealias ShouldSavePhoto = Bool
+    public var didCapturePhoto: ((UIImage) -> ShouldSavePhoto)?
     let photoCapture = newPhotoCapture()
     let v: YPCameraView!
     var isInited = false
@@ -153,14 +153,16 @@ public class YPCameraVC: UIViewController, UIGestureRecognizerDelegate, YPPermis
             
             DispatchQueue.main.async {
                 let noOrietationImage = image.resetOrientation()
-                self.didCapturePhoto?(noOrietationImage.resizedImageIfNeeded())
-                self.v.shotButton.isEnabled = true
-                self.photoCapture.start(with: self.v.previewViewContainer, completion: {
-                    DispatchQueue.main.async {
-                        self.isInited = true
-                        self.refreshFlashButton()
-                    }
-                })
+                if self.didCapturePhoto?(noOrietationImage.resizedImageIfNeeded()) ?? false {
+                    YPPhotoSaver.trySaveImage(noOrietationImage, inAlbumNamed: YPConfig.albumName)
+                    self.photoCapture.start(with: self.v.previewViewContainer, completion: {
+                        DispatchQueue.main.async {
+                            self.v.shotButton.isEnabled = true
+                            self.isInited = true
+                            self.refreshFlashButton()
+                        }
+                    })
+                }
             }
         }
     }

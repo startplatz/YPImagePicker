@@ -38,7 +38,6 @@ open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate {
     private var libraryVC: YPLibraryVC?
     private var cameraVC: YPCameraVC?
     private var videoVC: YPVideoCaptureVC?
-    private var capturedPictures = [YPMediaItem]()
     
     var mode = Mode.camera
     
@@ -66,15 +65,14 @@ open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate {
         if YPConfig.screens.contains(.photo) {
             cameraVC = YPCameraVC()
             cameraVC?.didCapturePhoto = { [weak self] img in
-                guard let `self` = self else { return }
-                
-                let maxNumberOfItems = YPImagePickerConfiguration.shared.library.maxNumberOfItems
-                self.capturedPictures.append(YPMediaItem.photo(p: YPMediaPhoto(image: img, fromCamera: true)))
-
-                if maxNumberOfItems > 1 && self.capturedPictures.count < maxNumberOfItems {
-                    YPImagePickerConfiguration.shared.library.maxNumberOfItems -= 1
+                if YPConfig.library.maxNumberOfItems > 1 {
+                    return true
                 } else {
-                    self.didSelectItems?(self.capturedPictures)
+                    self?.didSelectItems?([
+                        YPMediaItem.photo(p: YPMediaPhoto(image: img,
+                                                          fromCamera: true))
+                    ])
+                    return false
                 }
             }
         }
@@ -357,14 +355,14 @@ extension YPPickerVC: YPLibraryViewDelegate {
     }
     
     public func libraryViewDidToggleMultipleSelection(enabled: Bool) {
-        var offset = v.header.frame.height
-        if #available(iOS 11.0, *) {
-            offset += v.safeAreaInsets.bottom
-        }
-        
-        v.header.bottomConstraint?.constant = enabled ? offset : 0
-        v.layoutIfNeeded()
-        updateUI()
+//        var offset = v.header.frame.height
+//        if #available(iOS 11.0, *) {
+//            offset += v.safeAreaInsets.bottom
+//        }
+//        
+//        v.header.bottomConstraint?.constant = enabled ? offset : 0
+//        v.layoutIfNeeded()
+//        updateUI()
     }
     
     public func noPhotosForOptions() {

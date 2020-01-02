@@ -38,6 +38,33 @@ extension YPLibraryVC {
         }
     }
     
+    func select(at indexPath: IndexPath) {
+        if multipleSelectionEnabled {
+            if let collectionView = v.collectionView {
+                let previouslySelectedIndexPath = IndexPath(row: currentlySelectedIndex + 1, section: 0)
+                currentlySelectedIndex = indexPath.row
+                
+                changeAsset(mediaManager.fetchResult[indexPath.row])
+                panGestureHelper.resetToOriginalState()
+                
+                // Only scroll cell to top if preview is hidden.
+                if !panGestureHelper.isImageShown {
+                    collectionView.scrollToItem(at: indexPath, at: .top, animated: true)
+                }
+                v.refreshImageCurtainAlpha()
+                
+                if isLimitExceeded == false {
+                    addAndChangeIndexPaths(indexPath: indexPath)
+                }
+                
+                collectionView.reloadItems(at: [indexPath])
+                collectionView.reloadItems(at: [previouslySelectedIndexPath])
+            }
+        } else {
+            startMultipleSelection(at: indexPath)
+        }
+    }
+    
     func startMultipleSelection(at indexPath: IndexPath) {
         currentlySelectedIndex = indexPath.row
         multipleSelectionButtonTapped()
@@ -91,6 +118,12 @@ extension YPLibraryVC {
             )
         )
         checkLimit()
+    }
+    
+    func addAndChangeIndexPaths(indexPath: IndexPath) {
+        let tempSelection = selection.map { YPLibrarySelection(index: $0.index + 1, assetIdentifier: $0.assetIdentifier) }
+        selection = tempSelection
+        addToSelection(indexPath: indexPath)
     }
     
     func isInSelectionPool(indexPath: IndexPath) -> Bool {
