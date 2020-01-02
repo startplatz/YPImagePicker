@@ -13,9 +13,7 @@ import AVFoundation
 // MARK: - Global functions
 
 func deviceForPosition(_ p: AVCaptureDevice.Position) -> AVCaptureDevice? {
-    let devices = AVCaptureDevice.DiscoverySession(deviceTypes: [], mediaType: .video, position: p).devices
-
-    for device in devices {
+    for device in AVCaptureDevice.devices(for: AVMediaType.video) where device.position == p {
         return device
     }
     return nil
