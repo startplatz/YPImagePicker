@@ -10,6 +10,13 @@ import UIKit
 import AVFoundation
 import Photos
 
+
+public protocol YPCameraVCDelegate: class {
+    func startedLoading()
+    func finishedLoading()
+    func animateView(image: UIImage, withFrame frame: CGRect)
+}
+
 public class YPCameraVC: UIViewController, UIGestureRecognizerDelegate, YPPermissionCheckable {
     public typealias ShouldSavePhoto = Bool
     public var didCapturePhoto: ((UIImage) -> ShouldSavePhoto)?
@@ -18,7 +25,9 @@ public class YPCameraVC: UIViewController, UIGestureRecognizerDelegate, YPPermis
     var isInited = false
     var videoZoomFactor: CGFloat = 1.0
     override public func loadView() { view = v }
-
+    
+    public weak var delegate: YPCameraVCDelegate?
+    
     public required init() {
         self.v = YPCameraView(overlayView: YPConfig.overlayView)
         super.init(nibName: nil, bundle: nil)
@@ -66,7 +75,7 @@ public class YPCameraVC: UIViewController, UIGestureRecognizerDelegate, YPPermis
             })
         }
     }
-
+    
     @objc
     func focusTapped(_ recognizer: UITapGestureRecognizer) {
         guard isInited else {
@@ -79,7 +88,7 @@ public class YPCameraVC: UIViewController, UIGestureRecognizerDelegate, YPPermis
     }
     
     func focus(recognizer: UITapGestureRecognizer) {
-
+        
         let point = recognizer.location(in: v.previewViewContainer)
         
         // Focus the capture
@@ -108,7 +117,7 @@ public class YPCameraVC: UIViewController, UIGestureRecognizerDelegate, YPPermis
     func zoom(recognizer: UIPinchGestureRecognizer) {
         photoCapture.zoom(began: recognizer.state == .began, scale: recognizer.scale)
     }
-        
+    
     func stopCamera() {
         photoCapture.stopCamera()
     }
@@ -129,13 +138,32 @@ public class YPCameraVC: UIViewController, UIGestureRecognizerDelegate, YPPermis
         }
     }
     
-    func shoot() {
+    func shoot() { /// AATODO: Need refact 
+        delegate?.startedLoading()
+        print("AAABB shoot func A")
         // Prevent from tapping multiple times in a row
         // causing a crash
         v.shotButton.isEnabled = false
-        
+        print("AAABB shotButton.isEnabled = false")
         photoCapture.shoot { imageData in
-            guard let shotImage = UIImage(data: imageData) else { return }
+            print("AAABB shotButton.isEnabled = false")
+            guard let data = imageData,
+            let shotImage = UIImage(data: data) else {
+                print("AAABB 1")
+                self.photoCapture.start(with: self.v.previewViewContainer, completion: {
+                    print("AAABB 10")
+                    DispatchQueue.main.async {
+                        print("AAABB 11")
+                        self.v.shotButton.isEnabled = true
+                        self.isInited = true
+                        self.refreshFlashButton()
+                        print("AAABB -------------------------------")
+                        print("AAABB -------------------------------")
+                        print("AAABB -------------------------------")
+                    }
+                })
+                return
+            }
             
             self.photoCapture.stopCamera()
             
@@ -144,24 +172,36 @@ public class YPCameraVC: UIViewController, UIGestureRecognizerDelegate, YPPermis
             if YPConfig.onlySquareImagesFromCamera {
                 image = self.cropImageToSquare(image)
             }
-
+            
             // Flip image if taken form the front camera.
             if let device = self.photoCapture.device,
-            device.position == .front {
+                device.position == .front {
                 image = self.flipImage(image: image)
             }
             
             DispatchQueue.main.async {
+                print("AAABB 2")
                 let noOrietationImage = image.resetOrientation()
                 if self.didCapturePhoto?(noOrietationImage.resizedImageIfNeeded()) ?? false {
+                    print("AAABB 3")
                     YPPhotoSaver.trySaveImage(noOrietationImage, inAlbumNamed: YPConfig.albumName)
+
                     self.photoCapture.start(with: self.v.previewViewContainer, completion: {
+                        print("AAABB 4")
                         DispatchQueue.main.async {
+                            self.delegate?.animateView(image: noOrietationImage, withFrame: self.v.previewViewContainer.frame)
+                            self.delegate?.finishedLoading()
+                            print("AAABB 5")
                             self.v.shotButton.isEnabled = true
                             self.isInited = true
                             self.refreshFlashButton()
+                            print("AAABB -------------------------------")
+                            print("AAABB -------------------------------")
+                            print("AAABB -------------------------------")
                         }
                     })
+                } else {
+                    print("AAABB 6")
                 }
             }
         }

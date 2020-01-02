@@ -27,7 +27,7 @@ class PostiOS10PhotoCapture: NSObject, YPPhotoCapture {
         guard let device = device else { return false }
         return device.hasFlash
     }
-    var block: ((Data) -> Void)?
+    var block: ((Data?) -> Void)?
     var initVideoZoomFactor: CGFloat = 1.0
     
     // MARK: - Configuration
@@ -87,7 +87,8 @@ class PostiOS10PhotoCapture: NSObject, YPPhotoCapture {
     
     // MARK: - Shoot
 
-    func shoot(completion: @escaping (Data) -> Void) {
+    func shoot(completion: @escaping (Data?) -> Void) {
+        print("AAABB shoot func B")
         block = completion
     
         // Set current device orientation
@@ -104,7 +105,14 @@ class PostiOS10PhotoCapture: NSObject, YPPhotoCapture {
 // MARK: - AVCapturePhotoCaptureDelegate
 extension PostiOS10PhotoCapture: AVCapturePhotoCaptureDelegate {
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
-        guard let data = photo.fileDataRepresentation() else { return }
+        
+        guard let data = photo.fileDataRepresentation() else {
+            block?(nil)
+            print("AAABB didFinishProcessingPhoto error:", error?.localizedDescription)
+            return
+        }
+        
+        print("AAABB ")
         block?(data)
     }
 }

@@ -45,7 +45,7 @@ open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate {
     
     open override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         view.backgroundColor = YPConfig.colors.safeAreaBackgroundColor
         
         delegate = self
@@ -64,6 +64,7 @@ open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate {
         // Camera
         if YPConfig.screens.contains(.photo) {
             cameraVC = YPCameraVC()
+            cameraVC?.delegate = self
             cameraVC?.didCapturePhoto = { [weak self] img in
                 if YPConfig.library.maxNumberOfItems > 1 {
                     return true
@@ -177,7 +178,7 @@ open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate {
         } else if let videoVC = vc as? YPVideoCaptureVC {
             videoVC.start()
         }
-    
+        
         updateUI()
     }
     
@@ -275,7 +276,7 @@ open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate {
                                                            target: self,
                                                            action: #selector(close))
         navigationItem.leftBarButtonItem?.tintColor = YPConfig.colors.tintColor
-
+        
         switch mode {
         case .library:
             setTitleViewWithTitle(aTitle: libraryVC?.title ?? "")
@@ -287,7 +288,7 @@ open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate {
             
             // Disable Next Button until minNumberOfItems is reached.
             navigationItem.rightBarButtonItem?.isEnabled = libraryVC!.selection.count >= YPConfig.library.minNumberOfItems
-
+            
         case .camera:
             navigationItem.titleView = nil
             title = cameraVC?.title
@@ -355,19 +356,65 @@ extension YPPickerVC: YPLibraryViewDelegate {
     }
     
     public func libraryViewDidToggleMultipleSelection(enabled: Bool) {
-//        var offset = v.header.frame.height
-//        if #available(iOS 11.0, *) {
-//            offset += v.safeAreaInsets.bottom
-//        }
-//        
-//        v.header.bottomConstraint?.constant = enabled ? offset : 0
-//        v.layoutIfNeeded()
-//        updateUI()
+        //        var offset = v.header.frame.height
+        //        if #available(iOS 11.0, *) {
+        //            offset += v.safeAreaInsets.bottom
+        //        }
+        //
+        //        v.header.bottomConstraint?.constant = enabled ? offset : 0
+        //        v.layoutIfNeeded()
+        //        updateUI()
     }
     
     public func noPhotosForOptions() {
         self.dismiss(animated: true) {
             self.imagePickerDelegate?.noPhotos()
         }
+    }
+}
+
+
+// MARK: - YPCameraVCDelegate
+extension YPPickerVC: YPCameraVCDelegate {
+    public func animateView(image: UIImage, withFrame frame: CGRect) {
+        guard let menuItem = self.v.header.menuItems.first else { return }
+        let imageView = UIImageView(frame: frame)
+        imageView.image = image
+        imageView.contentMode = .scaleAspectFill
+        
+        self.view.addSubview(imageView)
+        
+        let size = menuItem.bounds.size
+        let frame = CGRect(origin: CGPoint(x: 0, y: self.view.frame.height - size.height), size: size)
+        UIView.animate(withDuration: 0.8, delay: 0, options: .curveEaseOut, animations: {
+            imageView.frame = frame
+            imageView.alpha = 0.0
+        }) { _ in
+            menuItem.textLabel.pulsate()
+            imageView.removeFromSuperview()
+        }
+    }
+    
+    public func startedLoading() {
+        libraryViewStartedLoading()
+    }
+    
+    public func finishedLoading() {
+        libraryViewFinishedLoading()
+    }
+}
+
+
+extension UIView {
+    func pulsate(repeatCount: Float = 1) {
+        let pulse = CASpringAnimation(keyPath: "transform.scale")
+        pulse.duration = 0.4
+        pulse.fromValue = 1
+        pulse.toValue = 1.3
+        pulse.autoreverses = true
+        pulse.repeatCount = repeatCount
+        pulse.initialVelocity = 2
+
+        layer.add(pulse, forKey: nil)
     }
 }
