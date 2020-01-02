@@ -91,7 +91,10 @@ class YPVideoCaptureHelper: NSObject {
             }
             
             // Re Add audio recording
-            for device in AVCaptureDevice.devices(for: .audio) {
+            let devices = AVCaptureDevice.DiscoverySession(deviceTypes: [], mediaType: .audio, position: .unspecified).devices
+            
+            
+            for device in devices {//AVCaptureDevice.devices(for: .audio) {
                 if let audioInput = try? AVCaptureDeviceInput(device: device) {
                     if strongSelf.session.canAddInput(audioInput) {
                         strongSelf.session.addInput(audioInput)

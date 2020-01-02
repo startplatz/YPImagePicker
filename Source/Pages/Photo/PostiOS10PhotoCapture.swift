@@ -10,7 +10,7 @@ import UIKit
 import AVFoundation
 
 @available(iOS 10.0, *)
-class PostiOS10PhotoCapture: NSObject, YPPhotoCapture, AVCapturePhotoCaptureDelegate {
+class PostiOS10PhotoCapture: NSObject, YPPhotoCapture {
 
     let sessionQueue = DispatchQueue(label: "YPCameraVCSerialQueue", qos: .background)
     let session = AVCaptureSession()
@@ -35,11 +35,8 @@ class PostiOS10PhotoCapture: NSObject, YPPhotoCapture, AVCapturePhotoCaptureDele
     private func newSettings() -> AVCapturePhotoSettings {
         var settings = AVCapturePhotoSettings()
         
-        // Catpure Heif when available.
-        if #available(iOS 11.0, *) {
-            if photoOutput.availablePhotoCodecTypes.contains(.hevc) {
-                settings = AVCapturePhotoSettings(format: [AVVideoCodecKey: AVVideoCodecType.hevc])
-            }
+        if photoOutput.availablePhotoCodecTypes.contains(.hevc) {
+            settings = AVCapturePhotoSettings(format: [AVVideoCodecKey: AVVideoCodecType.hevc])
         }
         
         // Catpure Highest Quality possible.
@@ -100,23 +97,14 @@ class PostiOS10PhotoCapture: NSObject, YPPhotoCapture, AVCapturePhotoCaptureDele
         photoOutput.capturePhoto(with: settings, delegate: self)
     }
 
-    @available(iOS 11.0, *)
+
+}
+
+
+// MARK: - AVCapturePhotoCaptureDelegate
+extension PostiOS10PhotoCapture: AVCapturePhotoCaptureDelegate {
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
         guard let data = photo.fileDataRepresentation() else { return }
         block?(data)
-    }
-        
-    func photoOutput(_ output: AVCapturePhotoOutput,
-                     didFinishProcessingPhoto photoSampleBuffer: CMSampleBuffer?,
-                     previewPhoto previewPhotoSampleBuffer: CMSampleBuffer?,
-                     resolvedSettings: AVCaptureResolvedPhotoSettings,
-                     bracketSettings: AVCaptureBracketedStillImageSettings?,
-                     error: Error?) {
-        guard let buffer = photoSampleBuffer else { return }
-        if let data = AVCapturePhotoOutput
-            .jpegPhotoDataRepresentation(forJPEGSampleBuffer: buffer,
-                                         previewPhotoSampleBuffer: previewPhotoSampleBuffer) {
-            block?(data)
-        }
     }
 }

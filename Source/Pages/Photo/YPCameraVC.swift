@@ -135,10 +135,7 @@ public class YPCameraVC: UIViewController, UIGestureRecognizerDelegate, YPPermis
         v.shotButton.isEnabled = false
         
         photoCapture.shoot { imageData in
-            
-            guard let shotImage = UIImage(data: imageData) else {
-                return
-            }
+            guard let shotImage = UIImage(data: imageData) else { return }
             
             self.photoCapture.stopCamera()
             
@@ -149,13 +146,21 @@ public class YPCameraVC: UIViewController, UIGestureRecognizerDelegate, YPPermis
             }
 
             // Flip image if taken form the front camera.
-            if let device = self.photoCapture.device, device.position == .front {
+            if let device = self.photoCapture.device,
+            device.position == .front {
                 image = self.flipImage(image: image)
             }
             
             DispatchQueue.main.async {
                 let noOrietationImage = image.resetOrientation()
                 self.didCapturePhoto?(noOrietationImage.resizedImageIfNeeded())
+                self.v.shotButton.isEnabled = true
+                self.photoCapture.start(with: self.v.previewViewContainer, completion: {
+                    DispatchQueue.main.async {
+                        self.isInited = true
+                        self.refreshFlashButton()
+                    }
+                })
             }
         }
     }

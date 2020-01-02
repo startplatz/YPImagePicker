@@ -38,6 +38,7 @@ open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate {
     private var libraryVC: YPLibraryVC?
     private var cameraVC: YPCameraVC?
     private var videoVC: YPVideoCaptureVC?
+    private var capturedPictures = [YPMediaItem]()
     
     var mode = Mode.camera
     
@@ -65,8 +66,16 @@ open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate {
         if YPConfig.screens.contains(.photo) {
             cameraVC = YPCameraVC()
             cameraVC?.didCapturePhoto = { [weak self] img in
-                self?.didSelectItems?([YPMediaItem.photo(p: YPMediaPhoto(image: img,
-                                                                        fromCamera: true))])
+                guard let `self` = self else { return }
+                
+                let maxNumberOfItems = YPImagePickerConfiguration.shared.library.maxNumberOfItems
+                self.capturedPictures.append(YPMediaItem.photo(p: YPMediaPhoto(image: img, fromCamera: true)))
+
+                if maxNumberOfItems > 1 && self.capturedPictures.count < maxNumberOfItems {
+                    YPImagePickerConfiguration.shared.library.maxNumberOfItems -= 1
+                } else {
+                    self.didSelectItems?(self.capturedPictures)
+                }
             }
         }
         
@@ -74,10 +83,9 @@ open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate {
         if YPConfig.screens.contains(.video) {
             videoVC = YPVideoCaptureVC()
             videoVC?.didCaptureVideo = { [weak self] videoURL in
-                self?.didSelectItems?([YPMediaItem
-                    .video(v: YPMediaVideo(thumbnail: thumbnailFromVideoPath(videoURL),
-                                           videoURL: videoURL,
-                                           fromCamera: true))])
+                self?.didSelectItems?([YPMediaItem.video(v: YPMediaVideo(thumbnail: thumbnailFromVideoPath(videoURL),
+                                                                         videoURL: videoURL,
+                                                                         fromCamera: true))])
             }
         }
         

@@ -38,11 +38,7 @@ protocol YPPhotoCapture: class {
 }
 
 func newPhotoCapture() -> YPPhotoCapture {
-    if #available(iOS 10.0, *) {
-        return PostiOS10PhotoCapture()
-    } else {
-        return PreiOS10PhotoCapture()
-    }
+    PostiOS10PhotoCapture()
 }
 
 enum YPFlashMode {

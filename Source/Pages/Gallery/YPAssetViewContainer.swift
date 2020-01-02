@@ -131,7 +131,7 @@ class YPAssetViewContainer: UIView {
 // MARK: - ZoomableViewDelegate
 extension YPAssetViewContainer: YPAssetZoomableViewDelegate {
     public func ypAssetZoomableViewDidLayoutSubviews(_ zoomableView: YPAssetZoomableView) {
-        let newFrame = zoomableView.assetImageView.convert(zoomableView.assetImageView.bounds, to: self)
+//        _ = zoomableView.assetImageView.convert(zoomableView.assetImageView.bounds, to: self)
         
         // update grid position
 //        grid.frame = frame.intersection(newFrame)
