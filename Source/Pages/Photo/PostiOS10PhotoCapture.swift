@@ -88,7 +88,6 @@ class PostiOS10PhotoCapture: NSObject, YPPhotoCapture {
     // MARK: - Shoot
 
     func shoot(completion: @escaping (Data?) -> Void) {
-        print("AAABB shoot func B")
         block = completion
     
         // Set current device orientation
@@ -108,11 +107,9 @@ extension PostiOS10PhotoCapture: AVCapturePhotoCaptureDelegate {
         
         guard let data = photo.fileDataRepresentation() else {
             block?(nil)
-            print("AAABB didFinishProcessingPhoto error:", error?.localizedDescription)
             return
         }
         
-        print("AAABB ")
         block?(data)
     }
 }

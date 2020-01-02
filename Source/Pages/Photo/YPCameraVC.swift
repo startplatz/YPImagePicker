@@ -138,30 +138,13 @@ public class YPCameraVC: UIViewController, UIGestureRecognizerDelegate, YPPermis
         }
     }
     
-    func shoot() { /// AATODO: Need refact 
+    func shoot() {
         delegate?.startedLoading()
-        print("AAABB shoot func A")
-        // Prevent from tapping multiple times in a row
-        // causing a crash
         v.shotButton.isEnabled = false
-        print("AAABB shotButton.isEnabled = false")
         photoCapture.shoot { imageData in
-            print("AAABB shotButton.isEnabled = false")
             guard let data = imageData,
             let shotImage = UIImage(data: data) else {
-                print("AAABB 1")
-                self.photoCapture.start(with: self.v.previewViewContainer, completion: {
-                    print("AAABB 10")
-                    DispatchQueue.main.async {
-                        print("AAABB 11")
-                        self.v.shotButton.isEnabled = true
-                        self.isInited = true
-                        self.refreshFlashButton()
-                        print("AAABB -------------------------------")
-                        print("AAABB -------------------------------")
-                        print("AAABB -------------------------------")
-                    }
-                })
+                self.resetCamera()
                 return
             }
             
@@ -180,31 +163,27 @@ public class YPCameraVC: UIViewController, UIGestureRecognizerDelegate, YPPermis
             }
             
             DispatchQueue.main.async {
-                print("AAABB 2")
                 let noOrietationImage = image.resetOrientation()
                 if self.didCapturePhoto?(noOrietationImage.resizedImageIfNeeded()) ?? false {
-                    print("AAABB 3")
                     YPPhotoSaver.trySaveImage(noOrietationImage, inAlbumNamed: YPConfig.albumName)
-
-                    self.photoCapture.start(with: self.v.previewViewContainer, completion: {
-                        print("AAABB 4")
-                        DispatchQueue.main.async {
-                            self.delegate?.animateView(image: noOrietationImage, withFrame: self.v.previewViewContainer.frame)
-                            self.delegate?.finishedLoading()
-                            print("AAABB 5")
-                            self.v.shotButton.isEnabled = true
-                            self.isInited = true
-                            self.refreshFlashButton()
-                            print("AAABB -------------------------------")
-                            print("AAABB -------------------------------")
-                            print("AAABB -------------------------------")
-                        }
-                    })
-                } else {
-                    print("AAABB 6")
+                    self.resetCamera(image: noOrietationImage)
                 }
             }
         }
+    }
+    
+    private func resetCamera(image: UIImage? = nil) {
+        self.photoCapture.start(with: self.v.previewViewContainer, completion: {
+            DispatchQueue.main.async {
+                if let image = image {
+                    self.delegate?.animateView(image: image, withFrame: self.v.previewViewContainer.frame)
+                    self.delegate?.finishedLoading()
+                }
+                self.v.shotButton.isEnabled = true
+                self.isInited = true
+                self.refreshFlashButton()
+            }
+        })
     }
     
     func cropImageToSquare(_ image: UIImage) -> UIImage {

@@ -37,28 +37,23 @@ extension YPPhotoCapture {
     // MARK: - Start/Stop Camera
     
     func start(with previewView: UIView, completion: @escaping () -> Void) {
-        print("AAABB previewView 1")
         self.previewView = previewView
         sessionQueue.async { [weak self] in
             guard let strongSelf = self else {
-                print("AAABB previewView 2")
                 return
             }
             if !strongSelf.isCaptureSessionSetup {
                 strongSelf.setupCaptureSession()
             }
             strongSelf.startCamera(completion: {
-                print("AAABB previewView 3")
                 completion()
             })
         }
     }
     
     func startCamera(completion: @escaping (() -> Void)) {
-        print("AAABB startCamera 1")
         if !session.isRunning {
             sessionQueue.async { [weak self] in
-                print("AAABB startCamera 2")
                 // Re-apply session preset
                 self?.session.sessionPreset = .photo
                 let status = AVCaptureDevice.authorizationStatus(for: AVMediaType.video)
@@ -73,8 +68,6 @@ extension YPPhotoCapture {
                     fatalError()
                 }
             }
-        } else {
-            print("AAABB startCamera 3")
         }
     }
     
