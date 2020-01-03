@@ -290,9 +290,18 @@ open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate {
             navigationItem.rightBarButtonItem?.isEnabled = libraryVC!.selection.count >= YPConfig.library.minNumberOfItems
             
         case .camera:
+            setTitleViewWithTitle(aTitle: libraryVC?.title ?? "")
+            navigationItem.rightBarButtonItem = UIBarButtonItem(title: YPConfig.wordings.next,
+                                                                style: .done,
+                                                                target: self,
+                                                                action: #selector(done))
+            navigationItem.rightBarButtonItem?.tintColor = YPConfig.colors.tintColor
+            
+            // Disable Next Button until minNumberOfItems is reached.
+            navigationItem.rightBarButtonItem?.isEnabled = libraryVC!.selection.count >= YPConfig.library.minNumberOfItems
+            
             navigationItem.titleView = nil
             title = cameraVC?.title
-            navigationItem.rightBarButtonItem = nil
         case .video:
             navigationItem.titleView = nil
             title = videoVC?.title
@@ -314,7 +323,7 @@ open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate {
     func done() {
         guard let libraryVC = libraryVC else { print("⚠️ YPPickerVC >>> YPLibraryVC deallocated"); return }
         
-        if mode == .library {
+//        if mode == .library {
             libraryVC.doAfterPermissionCheck { [weak self] in
                 libraryVC.selectedMedia(photoCallback: { photo in
                     self?.didSelectItems?([YPMediaItem.photo(p: photo)])
@@ -325,7 +334,7 @@ open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate {
                     self?.didSelectItems?(items)
                 })
             }
-        }
+//        }
     }
     
     func stopAll() {

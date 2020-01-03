@@ -115,6 +115,7 @@ public class YPLibraryVC: UIViewController, YPPermissionCheckable {
     public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
+        registerForLibraryChanges()
         v.assetViewContainer.squareCropButton
             .addTarget(self,
                        action: #selector(squareCropButtonTapped),

@@ -177,8 +177,8 @@ public class YPCameraVC: UIViewController, UIGestureRecognizerDelegate, YPPermis
             DispatchQueue.main.async {
                 if let image = image {
                     self.delegate?.animateView(image: image, withFrame: self.v.previewViewContainer.frame)
-                    self.delegate?.finishedLoading()
                 }
+                self.delegate?.finishedLoading()
                 self.v.shotButton.isEnabled = true
                 self.isInited = true
                 self.refreshFlashButton()

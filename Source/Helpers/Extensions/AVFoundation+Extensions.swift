@@ -13,10 +13,7 @@ import AVFoundation
 // MARK: - Global functions
 
 func deviceForPosition(_ p: AVCaptureDevice.Position) -> AVCaptureDevice? {
-    for device in AVCaptureDevice.devices(for: AVMediaType.video) where device.position == p {
-        return device
-    }
-    return nil
+    AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInWideAngleCamera], mediaType: .video, position: p).devices.first
 }
 
 func thumbnailFromVideoPath(_ path: URL) -> UIImage {
