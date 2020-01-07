@@ -40,29 +40,32 @@ extension YPLibraryVC {
     }
     
     func select(at indexPath: IndexPath) {
+        guard let collectionView = v.collectionView else { return }
         if multipleSelectionEnabled {
-            if let collectionView = v.collectionView {
-                let previouslySelectedIndexPath = IndexPath(row: currentlySelectedIndex + 1, section: 0)
-                currentlySelectedIndex = indexPath.row
-                
-                changeAsset(mediaManager.fetchResult[indexPath.row])
-                panGestureHelper.resetToOriginalState()
-                
-                // Only scroll cell to top if preview is hidden.
-                if !panGestureHelper.isImageShown {
-                    collectionView.scrollToItem(at: indexPath, at: .top, animated: true)
-                }
-                v.refreshImageCurtainAlpha()
-                
-                if isLimitExceeded == false {
-                    addAndChangeIndexPaths(indexPath: indexPath)
-                }
-                
-                collectionView.reloadItems(at: [indexPath])
-                collectionView.reloadItems(at: [previouslySelectedIndexPath])
+            let previouslySelectedIndexPath = IndexPath(row: currentlySelectedIndex + 1, section: 0)
+            currentlySelectedIndex = indexPath.row
+            
+            changeAsset(mediaManager.fetchResult[indexPath.row])
+            panGestureHelper.resetToOriginalState()
+            
+            // Only scroll cell to top if preview is hidden.
+            if !panGestureHelper.isImageShown {
+                collectionView.scrollToItem(at: indexPath, at: .top, animated: true)
             }
+            v.refreshImageCurtainAlpha()
+            
+            if isLimitExceeded == false {
+                addAndChangeIndexPaths(indexPath: indexPath)
+            }
+            
+            collectionView.reloadItems(at: [indexPath])
+            collectionView.reloadItems(at: [previouslySelectedIndexPath])
         } else {
             startMultipleSelection(at: indexPath)
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                collectionView.reloadItems(at: collectionView.indexPathsForVisibleItems)
+            }
         }
     }
     
