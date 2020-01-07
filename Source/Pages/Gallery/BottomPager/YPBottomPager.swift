@@ -118,5 +118,8 @@ open class YPBottomPager: UIViewController, UIScrollViewDelegate {
         }
         let currentMenuItem = v.header.menuItems[page]
         currentMenuItem.select()
+        if !(controllers[page] is YPLibraryVC) {
+            (controllers.first(where: {$0 is YPLibraryVC}) as? YPLibraryVC)?.checkPermission()
+        }
     }
 }
