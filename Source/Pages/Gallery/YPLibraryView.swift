@@ -53,13 +53,8 @@ final class YPLibraryView: UIView {
         
         // Layout
         |maxNumberWarningView|.bottom(0)
-        if #available(iOS 11.0, *) {
-            maxNumberWarningView.Top == safeAreaLayoutGuide.Bottom - 40
-            maxNumberWarningLabel.centerHorizontally().top(11)
-        } else {
-            maxNumberWarningView.height(40)
-            maxNumberWarningLabel.centerInContainer()
-        }
+        maxNumberWarningView.Top == safeAreaLayoutGuide.Bottom - 40
+        maxNumberWarningLabel.centerHorizontally().top(11)
         
         // Style
         maxNumberWarningView.backgroundColor = .ypSecondarySystemBackground

@@ -19,6 +19,8 @@ class YPCameraView: UIView, UIGestureRecognizerDelegate {
     let flashButton = UIButton()
     let timeElapsedLabel = UILabel()
     let progressBar = UIProgressView()
+    let maxNumberWarningView = UIView()
+    let maxNumberWarningLabel = UILabel()
 
     convenience init(overlayView: UIView? = nil) {
         self.init(frame: .zero)
@@ -113,5 +115,27 @@ class YPCameraView: UIView, UIGestureRecognizerDelegate {
         flipButton.setImage(YPConfig.icons.loopIcon, for: .normal)
         shotButton.setImage(YPConfig.icons.capturePhotoImage, for: .normal)
         shotButton.imageView?.tintColor = YPConfig.colors.tintColor
+        
+        setupMaxNumberOfItemsView()
+    }
+    
+    func setupMaxNumberOfItemsView() {
+        maxNumberWarningLabel.text = String(format: YPConfig.wordings.warningMaxItemsLimit, YPConfig.library.maxNumberOfItems)
+
+        // View Hierarchy
+        sv(
+            maxNumberWarningView.sv(
+                maxNumberWarningLabel
+            )
+        )
+        // Layout
+        |maxNumberWarningView|.bottom(0)
+        maxNumberWarningView.Top == safeAreaLayoutGuide.Bottom - 40
+        maxNumberWarningLabel.centerHorizontally().top(11)
+
+        // Style
+        maxNumberWarningView.backgroundColor = .ypSecondarySystemBackground
+        maxNumberWarningLabel.font = UIFont(name: "Helvetica Neue", size: 14)
+//        maxNumberWarningView.isHidden = true
     }
 }

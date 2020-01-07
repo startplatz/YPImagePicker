@@ -9,6 +9,7 @@
 import UIKit
 
 extension YPLibraryVC {
+    static let maxNumberWarningViewIsHidden = NSNotification.Name("maxNumberWarningViewIsHidden")
     var isLimitExceeded: Bool { return selection.count >= YPConfig.library.maxNumberOfItems }
     
     func setupCollectionView() {
@@ -132,7 +133,10 @@ extension YPLibraryVC {
     
     /// Checks if there can be selected more items. If no - present warning.
     func checkLimit() {
-        v.maxNumberWarningView.isHidden = !isLimitExceeded || multipleSelectionEnabled == false
+        let name = YPLibraryVC.maxNumberWarningViewIsHidden
+        let isHidden = !isLimitExceeded || multipleSelectionEnabled == false
+        NotificationCenter.default.post(name: name, object: nil, userInfo: [name.rawValue : isHidden])
+        v.maxNumberWarningView.isHidden = isHidden
     }
 }
 

@@ -42,6 +42,7 @@ public class YPCameraVC: UIViewController, UIGestureRecognizerDelegate, YPPermis
     
     deinit {
         YPDeviceOrientationHelper.shared.stopDeviceOrientationNotifier()
+        NotificationCenter.default.removeObserver(self)
     }
     
     override public func viewDidLoad() {
@@ -60,6 +61,14 @@ public class YPCameraVC: UIViewController, UIGestureRecognizerDelegate, YPPermis
         let pinchRecongizer = UIPinchGestureRecognizer(target: self, action: #selector(self.pinch(_:)))
         pinchRecongizer.delegate = self
         v.previewViewContainer.addGestureRecognizer(pinchRecongizer)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(setNumberWarningView(notification:)), name: YPLibraryVC.maxNumberWarningViewIsHidden, object: nil)
+    }
+    
+    @objc func setNumberWarningView(notification: NSNotification) {
+        if let isHidden = notification.userInfo?[YPLibraryVC.maxNumberWarningViewIsHidden.rawValue] as? Bool {
+            v.maxNumberWarningView.isHidden = isHidden
+        }
     }
     
     func start() {
